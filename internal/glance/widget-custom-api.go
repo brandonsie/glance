@@ -635,6 +635,9 @@ var customAPITemplateFuncs = func() template.FuncMap {
 			}
 			return out
 		},
+		"concatArrays": func(a, b []decoratedGJSONResult) []decoratedGJSONResult {
+			return append(a, b...)
+		},
 		"newRequest": func(url string) *CustomAPIRequest {
 			return &CustomAPIRequest{
 				URL: url,
