@@ -16,6 +16,18 @@
 
 ![](docs/images/readme-main-image.png)
 
+## Changes from main branch 
+* added some features to custom api widgets  
+  * withMethod (e.g. to allow POST requests)  
+  * concatArrays (to combine two JSON arrays into one)  
+  * filterBy (to subset an array)
+
+## Building this version
+```bash 
+docker build -t brandonsie/glance .
+docker compose up -d --force-recreate --build glance
+```
+
 ## Features
 ### Various widgets
 * RSS feeds

@@ -685,6 +685,45 @@ var customAPITemplateFuncs = func() template.FuncMap {
 
 			return data
 		},
+		"filterBy": func(key, operator, value string, results []decoratedGJSONResult) []decoratedGJSONResult {
+			filtered := make([]decoratedGJSONResult, 0, len(results))
+			for _, r := range results {
+				field := r.String(key)
+
+				matched := false
+				switch operator {
+				case "eq":
+					matched = field == value
+				case "neq":
+					matched = field != value
+				case "contains":
+					matched = strings.Contains(field, value)
+				case "match":
+					matched = regexp.MustCompile(value).MatchString(field)
+				case "lt", "gt", "lte", "gte":
+					f1, err1 := strconv.ParseFloat(field, 64)
+					f2, err2 := strconv.ParseFloat(value, 64)
+					if err1 == nil && err2 == nil {
+						switch operator {
+						case "lt":
+							matched = f1 < f2
+						case "gt":
+							matched = f1 > f2
+						case "lte":
+							matched = f1 <= f2
+						case "gte":
+							matched = f1 >= f2
+						}
+					}
+				}
+
+				if matched {
+					filtered = append(filtered, r)
+				}
+			}
+			return filtered
+		},
+
 	}
 
 	for key, value := range globalTemplateFunctions {
