@@ -20,7 +20,9 @@
 * added some features to custom api widgets  
   * withMethod (e.g. to allow POST requests)  
   * concatArrays (to combine two JSON arrays into one)  
-  * filterBy (to subset an array)
+  * filterBy (to subset an array)  
+* docker container widget  
+  * added a filter "nocategory" to show containers without a category label  
 
 ## Building this version
 ```bash 

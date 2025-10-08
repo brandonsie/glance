@@ -361,14 +361,25 @@ func fetchDockerContainersFromSource(
 
 	// We have to filter here instead of using the `filters` parameter of Docker's API
 	// because the user may define a category override within their config
+	// modified. if category = "nocategory" show widgets without category
 	if category != "" {
 		filtered := make([]dockerContainerJsonResponse, 0, len(containers))
 
 		for i := range containers {
 			container := &containers[i]
+			labelValue := container.Labels.getOrDefault(dockerContainerLabelCategory, "")
 
-			if container.Labels.getOrDefault(dockerContainerLabelCategory, "") == category {
-				filtered = append(filtered, *container)
+			switch {
+			case category == "nocategory":
+				// Include containers with no category label or empty category
+				if labelValue == "" {
+					filtered = append(filtered, *container)
+				}
+			default:
+				// Normal match
+				if labelValue == category {
+					filtered = append(filtered, *container)
+				}
 			}
 		}
 
