@@ -23,6 +23,16 @@
   * filterBy (to subset an array)  
 * docker container widget  
   * added a filter "nocategory" to show containers without a category label  
+* allow user javascript (from https://github.com/glanceapp/glance/pull/551)  
+  * Usage. In glance.yml, put the chunk below:  
+```yaml
+document:
+  head: |
+    <meta http-equiv="refresh" content="3600"> 
+    <script>
+      $include: /app/assets/user.js
+    </script>
+```
 
 ## Building this version
 ```bash 

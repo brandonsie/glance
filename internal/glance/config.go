@@ -42,7 +42,13 @@ type config struct {
 	} `yaml:"auth"`
 
 	Document struct {
-		Head template.HTML `yaml:"head"`
+		Head          template.HTML `yaml:"head"`
+		CustomJSFile  string        `yaml:"custom-js-file"`
+		CustomJSFiles []struct {
+			Src   string `yaml:"src"`
+			Defer bool   `yaml:"defer"`
+			Async bool   `yaml:"async"`
+		} `yaml:"custom-js-files"`
 	} `yaml:"document"`
 
 	Theme struct {
