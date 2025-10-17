@@ -23,6 +23,7 @@
   * filterBy (to subset an array)  
 * docker container widget  
   * added a filter "nocategory" to show containers without a category label  
+  * child containers have their icon, link, and description when nested under parent
 * allow user javascript (from https://github.com/glanceapp/glance/pull/551)  
   * Usage. In glance.yml, put the chunk below:  
 ```yaml

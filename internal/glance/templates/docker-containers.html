@@ -14,7 +14,9 @@
                     {{- range .Children }}
                         <li class="flex gap-7 items-center">
                             <div class="margin-bottom-3">{{ template "state-icon" .StateIcon }}</div>
-                            <img class="docker-container-icon{{ if .Icon.AutoInvert }} flat-icon{{ end }}" src="{{ .Icon.URL }}" alt="" loading="lazy">
+                            {{ if .HasCustomIcon }}
+                                <img class="docker-container-icon{{ if .Icon.AutoInvert }} flat-icon{{ end }}" src="{{ .Icon.URL }}" alt="" loading="lazy">
+                            {{ end }}
                             <div class="color-highlight">
                                 {{- if .URL }}
                                 <a href="{{ .URL }}" {{ if .SameTab }}target="_self"{{ else }}target="_blank"{{ end }}>
@@ -26,6 +28,11 @@
                                 <span class="size-h5 color-base">{{ .StateText }}</span>
                             </div>
                         </li>
+                        {{- if .Description }}
+                            <li style="text-align: right;">
+                                <div class="size-h5 color-base text-truncate">{{ .Description }}</div>
+                            </li>
+                        {{- end }}
                     {{- end }}
                 </ul>
                 {{- end }}

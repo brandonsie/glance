@@ -120,6 +120,7 @@ type dockerContainer struct {
 	StateIcon   string
 	Description string
 	Icon        customIconField
+	HasCustomIcon bool
 	Children    dockerContainerList
 }
 
@@ -169,29 +170,45 @@ func fetchDockerContainers(
 	for i := range containers {
 		container := &containers[i]
 
+		iconVal := container.Labels.getOrDefault(dockerContainerLabelIcon, "si:docker")
+
 		dc := dockerContainer{
-			Name:        deriveDockerContainerName(container, formatNames),
-			URL:         container.Labels.getOrDefault(dockerContainerLabelURL, ""),
-			Description: container.Labels.getOrDefault(dockerContainerLabelDescription, ""),
-			SameTab:     stringToBool(container.Labels.getOrDefault(dockerContainerLabelSameTab, "false")),
-			Image:       container.Image,
-			State:       strings.ToLower(container.State),
-			StateText:   strings.ToLower(container.Status),
-			Icon:        newCustomIconField(container.Labels.getOrDefault(dockerContainerLabelIcon, "si:docker")),
+			Name:          deriveDockerContainerName(container, formatNames),
+			URL:           container.Labels.getOrDefault(dockerContainerLabelURL, ""),
+			Description:   container.Labels.getOrDefault(dockerContainerLabelDescription, ""),
+			SameTab:       stringToBool(container.Labels.getOrDefault(dockerContainerLabelSameTab, "false")),
+			Image:         container.Image,
+			State:         strings.ToLower(container.State),
+			StateText:     strings.ToLower(container.Status),
+			Icon:          newCustomIconField(iconVal),
+			HasCustomIcon: iconVal != "si:docker",
 		}
 
+		// Attach any children
 		if idValue := container.Labels.getOrDefault(dockerContainerLabelID, ""); idValue != "" {
-			if children, ok := children[idValue]; ok {
-				for i := range children {
-					child := &children[i]
+			if childList, ok := children[idValue]; ok {
+				for j := range childList {
+					child := &childList[j]
+
+					iconLabel := child.Labels.getOrDefault(dockerContainerLabelIcon, "")
+					var iconField customIconField
+					hasCustomIcon := false
+					if iconLabel != "" {
+						iconField = newCustomIconField(iconLabel)
+						hasCustomIcon = true
+					} else {
+						iconField = customIconField{} // no default icon
+					}
+
 					dc.Children = append(dc.Children, dockerContainer{
-						Name:        deriveDockerContainerName(child, formatNames),
-						URL:         child.Labels.getOrDefault(dockerContainerLabelURL, ""),
-						SameTab:     stringToBool(child.Labels.getOrDefault(dockerContainerLabelSameTab, "false")),
-						Description: child.Labels.getOrDefault(dockerContainerLabelDescription, ""),
-						Icon:        newCustomIconField(child.Labels.getOrDefault(dockerContainerLabelIcon, "si:docker")),
-						StateText:   child.Status,
-						StateIcon:   dockerContainerStateToStateIcon(strings.ToLower(child.State)),
+						Name:           deriveDockerContainerName(child, formatNames),
+						URL:            child.Labels.getOrDefault(dockerContainerLabelURL, ""),
+						SameTab:        stringToBool(child.Labels.getOrDefault(dockerContainerLabelSameTab, "false")),
+						Description:    child.Labels.getOrDefault(dockerContainerLabelDescription, ""),
+						Icon:           iconField,
+						HasCustomIcon:  hasCustomIcon,
+						StateText:      child.Status,
+						StateIcon:      dockerContainerStateToStateIcon(strings.ToLower(child.State)),
 					})
 				}
 			}
@@ -199,9 +216,10 @@ func fetchDockerContainers(
 
 		dc.Children.sortByStateIconThenTitle()
 
+		// Promote child warn state to parent if any child warns
 		stateIconSupersededByChild := false
-		for i := range dc.Children {
-			if dc.Children[i].StateIcon == dockerContainerStateIconWarn {
+		for _, child := range dc.Children {
+			if child.StateIcon == dockerContainerStateIconWarn {
 				dc.StateIcon = dockerContainerStateIconWarn
 				stateIconSupersededByChild = true
 				break
