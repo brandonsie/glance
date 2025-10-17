@@ -12,10 +12,20 @@
                 {{- if .Children }}
                 <ul class="list list-gap-4 margin-top-10">
                     {{- range .Children }}
-                    <li class="flex gap-7 items-center">
-                        <div class="margin-bottom-3">{{ template "state-icon" .StateIcon }}</div>
-                        <div class="color-highlight">{{ .Name }} <span class="size-h5 color-base">{{ .StateText }}</span></div>
-                    </li>
+                        <li class="flex gap-7 items-center">
+                            <div class="margin-bottom-3">{{ template "state-icon" .StateIcon }}</div>
+                            <img class="docker-container-icon{{ if .Icon.AutoInvert }} flat-icon{{ end }}" src="{{ .Icon.URL }}" alt="" loading="lazy">
+                            <div class="color-highlight">
+                                {{- if .URL }}
+                                <a href="{{ .URL }}" {{ if .SameTab }}target="_self"{{ else }}target="_blank"{{ end }}>
+                                    {{ .Name }}
+                                </a>
+                                {{- else }}
+                                    {{ .Name }}
+                                {{- end }}
+                                <span class="size-h5 color-base">{{ .StateText }}</span>
+                            </div>
+                        </li>
                     {{- end }}
                 </ul>
                 {{- end }}

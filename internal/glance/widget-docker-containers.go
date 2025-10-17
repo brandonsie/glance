@@ -185,9 +185,13 @@ func fetchDockerContainers(
 				for i := range children {
 					child := &children[i]
 					dc.Children = append(dc.Children, dockerContainer{
-						Name:      deriveDockerContainerName(child, formatNames),
-						StateText: child.Status,
-						StateIcon: dockerContainerStateToStateIcon(strings.ToLower(child.State)),
+						Name:        deriveDockerContainerName(child, formatNames),
+						URL:         child.Labels.getOrDefault(dockerContainerLabelURL, ""),
+						SameTab:     stringToBool(child.Labels.getOrDefault(dockerContainerLabelSameTab, "false")),
+						Description: child.Labels.getOrDefault(dockerContainerLabelDescription, ""),
+						Icon:        newCustomIconField(child.Labels.getOrDefault(dockerContainerLabelIcon, "si:docker")),
+						StateText:   child.Status,
+						StateIcon:   dockerContainerStateToStateIcon(strings.ToLower(child.State)),
 					})
 				}
 			}
