@@ -381,6 +381,34 @@ func fetchDockerContainersFromSource(
 		}
 	}
 
+	// Add placeholders for configured containers that do not exist in Docker.
+	existing := make(map[string]bool, len(containers))
+	for i := range containers {
+		name := strings.TrimLeft(
+			itemAtIndexOrDefault(containers[i].Names, 0, ""),
+			"/",
+		)
+		existing[name] = true
+	}
+
+	for name, overrides := range labelOverrides {
+		if existing[name] {
+			continue
+		}
+
+		labels := make(dockerContainerLabels)
+		for label, value := range overrides {
+			labels["glance."+label] = value
+		}
+
+		containers = append(containers, dockerContainerJsonResponse{
+			Names:  []string{"/" + name},
+			State:  "missing",
+			Status: "not created",
+			Labels: labels,
+		})
+	}
+
 	// We have to filter here instead of using the `filters` parameter of Docker's API
 	// because the user may define a category override within their config
 	// modified. if category = "nocategory" show widgets without category

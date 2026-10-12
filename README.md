@@ -24,6 +24,7 @@
 * docker container widget  
   * added a filter "nocategory" to show containers without a category label  
   * child containers have their icon, link, and description when nested under parent
+  * display containers specified in yaml for which containers don't actually exist
 * allow user javascript (from https://github.com/glanceapp/glance/pull/551)  
   * Usage. In glance.yml, put the chunk below:  
 ```yaml
@@ -34,6 +35,7 @@ document:
       $include: /app/assets/user.js
     </script>
 ```
+* increased api request timeout from 5 seconds to 20 seconds in widget-utils.go 
 
 ## Building this version
 ```bash 
